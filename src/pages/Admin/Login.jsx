@@ -2,8 +2,9 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router";
+import { auth,db } from "../../config/firebase/firebase";
 
-import { auth, db } from "../../config/firebase/firebaseconfig";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
