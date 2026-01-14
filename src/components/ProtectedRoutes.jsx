@@ -1,65 +1,47 @@
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { auth,db } from "../config/firebase/firebase";
-import { useNavigate } from "react-router";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../config/firebase/firebase";
 
-// role = ["Admin"] or ["Student"]
-const ProtectedRoutes = ({ component, role }) => {
+const ProtectedRoutes = ({ children, role }) => {
   const [loading, setLoading] = useState(true);
-  const [isAllowed, setIsAllowed] = useState(false);
-  const navigate = useNavigate()
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setIsAllowed(false);
-        setLoading(false);
-        navigate('login')
-        return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        const storedRole = localStorage.getItem("userRole");
+        setUserRole(storedRole);
+      } else {
+        setIsAuthenticated(false);
+        setUserRole(null);
       }
-
-      try {
-        const q = query(
-          collection(db, "user"),
-          where("uid", "==", user.uid)
-        );
-
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          setIsAllowed(false);
-          setLoading(false);
-          return;
-        }
-
-        const userData = snapshot.docs[0].data();
-
-        if (role.includes(userData.role)) {
-          setIsAllowed(true);
-        } else {
-          setIsAllowed(false);
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsAllowed(false);
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [role]);
+  }, []);
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
 
-  return isAllowed ? component : <h1>Not Allowed</h1>;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role && !role.includes(userRole)) {
+    // Agar user ka role allowed roles me nahi hai
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoutes;
-
-
-
-
-// Higher order components HOC

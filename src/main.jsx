@@ -7,7 +7,7 @@ import Navbar from './components/Navbar'
 import ProtectedRoutes from './components/ProtectedRoutes'
 
 import Login from './pages/Admin/Login'
-import Dashboard from './pages/Admin/Dashboard'
+
 
 import StudentDashboard from './pages/Admin/student/StudentDashboard'
 
@@ -21,6 +21,7 @@ import Courses from './pages/Admin/courses/Courses'
 import Profile from './pages/Student/Profile'
 import Student from './pages/Admin/student/Student'
 import AssignCourse from './pages/Admin/AssignCourse'
+import Dashboard from './pages/Admin/Dashboard'
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
@@ -29,9 +30,9 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route path="/" element={
+        <Route index element={
           <ProtectedRoutes role={['Admin']}>
-            <Dashboard />
+            <Dashboard/>
           </ProtectedRoutes>
         } />
 
