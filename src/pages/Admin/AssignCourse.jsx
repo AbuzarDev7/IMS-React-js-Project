@@ -1,147 +1,109 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase/firebase';
 
-function AssignCourse() {
+export default function AssignCourse() {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Component load hone pe students aur courses fetch karo
   useEffect(() => {
     fetchStudents();
     fetchCourses();
   }, []);
 
-  // ============================================
-  // STEP 1: Students ko Firebase se fetch karo
-  // ============================================
   const fetchStudents = async () => {
-    try {
-      // Sirf students ko fetch karo (role = "student")
-      const q = query(
-        collection(db, 'users'), 
-        where('role', '==', 'student')
-      );
-      
-      const snapshot = await getDocs(q);
-      
-      const studentsList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        email: doc.data().email
-      }));
-      
-      setStudents(studentsList);
-      console.log("Students fetched:", studentsList);
-      
-    } catch (error) {
-      console.error("Error fetching students:", error);
-    }
+    const snapshot = await getDocs(collection(db, 'users'));
+    const studentList = snapshot.docs
+      .map(doc => {
+        const data = doc.data();
+        if (data.role?.toLowerCase() === 'student') {
+          return { uid: doc.id, name: data.name, email: data.email };
+        }
+        return null;
+      })
+      .filter(Boolean);
+    setStudents(studentList);
   };
 
-  // ============================================
-  // STEP 2: Courses ko Firebase se fetch karo
-  // ============================================
   const fetchCourses = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, 'courses'));
-      
-      const coursesList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        duration: doc.data().duration
-      }));
-      
-      setCourses(coursesList);
-      console.log("Courses fetched:", coursesList);
-      
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    }
+    const snapshot = await getDocs(collection(db, 'courses'));
+    const coursesList = snapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name
+    }));
+    setCourses(coursesList);
   };
 
-  // ============================================
-  // STEP 3: Course assign karo (MAIN FUNCTION)
-  // ============================================
   const handleAssign = async () => {
-    // Validation: Check karo ke dono select kiye hain
     if (!selectedStudent || !selectedCourse) {
-      alert('Please select both student and course!');
+      alert("Please select both student and course!");
       return;
     }
-
     setLoading(true);
 
     try {
-      // Firebase mein 'enrollments' collection mein save karo
-      const enrollmentData = {
-        studentId: selectedStudent,
+      // ✅ Save enrollment with student UID
+      await addDoc(collection(db, 'enrollments'), {
+        studentId: selectedStudent,  // Auth UID
         courseId: selectedCourse,
-        assignedAt: new Date(),
-        status: 'active'
-      };
+        assignedAt: new Date().toISOString()
+      });
 
-      await addDoc(collection(db, 'enrollments'), enrollmentData);
-      
-      alert('Course assigned successfully! ✅');
-      
-      // Form reset karo
+      alert("Course assigned successfully!");
       setSelectedStudent('');
       setSelectedCourse('');
-      
-    } catch (error) {
-      console.error('Error assigning course:', error);
-      alert('Failed to assign course! ❌');
+    } catch (err) {
+      console.error("Error assigning course:", err);
+      alert("Failed to assign course.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div>
-      <h2>Assign Course to Student</h2>
+    <div className="max-w-md mx-auto mt-20 p-6 bg-white shadow-md rounded-lg border border-gray-200">
+      <h2 className="text-center text-2xl font-semibold mb-6">Assign Course to Student</h2>
 
-      {/* Student Select Dropdown */}
-      <div>
-        <label>Select Student:</label>
-        <select 
-          value={selectedStudent} 
-          onChange={(e) => setSelectedStudent(e.target.value)}
+      <div className="mb-4">
+        <label className="block mb-2 font-medium text-gray-700">Select Student</label>
+        <select
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          value={selectedStudent}
+          onChange={e => setSelectedStudent(e.target.value)}
         >
-          <option value="">-- Choose Student --</option>
-          {students.map(student => (
-            <option key={student.id} value={student.id}>
-              {student.name} ({student.email})
+          <option value="">-- Select Student --</option>
+          {students.map(s => (
+            <option key={s.uid} value={s.uid}>
+              {s.name} ({s.email})
             </option>
           ))}
         </select>
       </div>
 
-      {/* Course Select Dropdown */}
-      <div>
-        <label>Select Course:</label>
-        <select 
-          value={selectedCourse} 
-          onChange={(e) => setSelectedCourse(e.target.value)}
+      <div className="mb-6">
+        <label className="block mb-2 font-medium text-gray-700">Select Course</label>
+        <select
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          value={selectedCourse}
+          onChange={e => setSelectedCourse(e.target.value)}
         >
-          <option value="">-- Choose Course --</option>
-          {courses.map(course => (
-            <option key={course.id} value={course.id}>
-              {course.name} ({course.duration})
-            </option>
+          <option value="">-- Select Course --</option>
+          {courses.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
       </div>
 
-      {/* Assign Button */}
-      <button onClick={handleAssign} disabled={loading}>
+      <button
+        className={`w-full py-3 text-white rounded ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+        onClick={handleAssign}
+        disabled={loading}
+      >
         {loading ? 'Assigning...' : 'Assign Course'}
       </button>
     </div>
   );
 }
-
-export default AssignCourse;

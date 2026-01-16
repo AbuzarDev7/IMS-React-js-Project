@@ -1,7 +1,4 @@
-// ============================================
-// FILE: src/pages/AddCourse.jsx
-// PURPOSE: Admin adds new courses to the system
-// ============================================
+
 
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
@@ -9,9 +6,7 @@ import { db } from "../../../config/firebase/firebase";
 import { useNavigate } from "react-router-dom";
 
 const AddCourse = () => {
-  // ============================================
-  // STATE MANAGEMENT
-  // ============================================
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -21,9 +16,6 @@ const AddCourse = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ============================================
-  // COURSE CATEGORIES (Predefined Options)
-  // ============================================
   const courseCategories = [
     "Web Development",
     "App Development", 
@@ -35,9 +27,7 @@ const AddCourse = () => {
     "Other"
   ];
 
-  // ============================================
-  // POPULAR COURSES WITH TEMPLATES
-  // ============================================
+
   const popularCourses = [
     {
       name: "Web Development Bootcamp",
@@ -71,9 +61,7 @@ const AddCourse = () => {
     }
   ];
 
-  // ============================================
-  // FUNCTION: Handle Input Changes
-  // ============================================
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -81,9 +69,6 @@ const AddCourse = () => {
     });
   };
 
-  // ============================================
-  // FUNCTION: Use Template Course
-  // ============================================
   const useTemplate = (template) => {
     setFormData({
       name: template.name,
@@ -95,9 +80,7 @@ const AddCourse = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ============================================
-  // FUNCTION: Handle Form Submission
-  // ============================================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -115,8 +98,8 @@ const AddCourse = () => {
         status: "active"
       });
 
-      console.log("✅ Course added successfully!");
-      alert("✅ Course successfully added!");
+      console.log(" Course added successfully!");
+      alert(" Course successfully added!");
 
       // Reset form
       setFormData({
@@ -126,20 +109,16 @@ const AddCourse = () => {
         category: ""
       });
 
-      // Optional: Navigate to courses list
-      // navigate("/courses");
 
     } catch (error) {
-      console.error("❌ Error adding course:", error);
-      alert("❌ Error: " + error.message);
+      console.error(" Error adding course:", error);
+      alert(" Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================
-  // MAIN UI RENDER
-  // ============================================
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -274,7 +253,7 @@ const AddCourse = () => {
                 disabled={loading}
                 className="flex-1 bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 disabled:bg-green-300 transition-colors font-bold text-lg shadow-lg"
               >
-                {loading ? "⏳ Adding Course..." : "✅ Add Course"}
+                {loading ? "⏳ Adding Course..." : " Add Course"}
               </button>
 
               <button
@@ -282,7 +261,7 @@ const AddCourse = () => {
                 onClick={() => navigate("/")}
                 className="flex-1 bg-gray-300 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-400 transition-colors font-bold text-lg"
               >
-                ❌ Cancel
+                Cancel
               </button>
             </div>
           </form>
@@ -336,72 +315,3 @@ const AddCourse = () => {
 export default AddCourse;
 
 
-// ============================================
-// FIRESTORE DATABASE STRUCTURE
-// ============================================
-
-/*
-
-COLLECTION: "courses"
-├── Document ID (auto-generated)
-    ├── name: "Web Development Bootcamp"
-    ├── description: "Complete web development course..."
-    ├── duration: "6 months"
-    ├── category: "Web Development"
-    ├── createdAt: "2024-01-15T10:00:00.000Z"
-    └── status: "active"
-
-EXAMPLE DOCUMENT:
-{
-  name: "Graphic Design Masterclass",
-  description: "Master Adobe Photoshop, Illustrator...",
-  duration: "3 months",
-  category: "Graphic Design",
-  createdAt: "2024-01-15T10:00:00.000Z",
-  status: "active"
-}
-
-*/
-
-
-// ============================================
-// ROUTE SETUP (App.jsx mein add karo)
-// ============================================
-
-/*
-
-import AddCourse from "./pages/AddCourse";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-
-// Routes section:
-<Route 
-  path="/courses/add" 
-  element={
-    <ProtectedRoutes role={["Admin"]}>
-      <AddCourse />
-    </ProtectedRoutes>
-  } 
-/>
-
-*/
-
-
-// ============================================
-// TESTING CHECKLIST
-// ============================================
-
-/*
-
-✅ 1. Admin se login karo
-✅ 2. "/courses/add" route pe jao
-✅ 3. Form fields fill karo
-✅ 4. Category select karo (Web Dev, App Dev, Graphic Design, UI/UX, AI)
-✅ 5. Duration select karo
-✅ 6. Preview check karo
-✅ 7. "Add Course" button dabao
-✅ 8. Success message aana chahiye
-✅ 9. Firestore check karo: "courses" collection mein data save hua?
-✅ 10. Template course use karne ki koshish karo
-✅ 11. Form auto-fill hona chahiye
-
-*/

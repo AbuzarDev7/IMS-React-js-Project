@@ -1,75 +1,67 @@
-import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase/firebase';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { db } from "../../config/firebase/firebase";
+import { useSelector } from "react-redux";
 
-function MyCourses() {
-  const [myCourses, setMyCourses] = useState([]);
+export default function MyCourses() {
+  const user = useSelector(state => state.auth.user); // Auth user
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Redux se logged-in student ki ID lena
-  const user = useSelector(state => state.auth.user);
 
   useEffect(() => {
-    fetchMyCourses();
-  }, []);
+    if (user?.uid) fetchCourses();
+  }, [user]);
 
-  const fetchMyCourses = async () => {
+  const fetchCourses = async () => {
     try {
-      // Step 1: Student ki enrollments find karo
-      const enrollmentsQuery = query(
-        collection(db, 'enrollments'),
-        where('studentId', '==', user.id)
-      );
-      
-      const enrollmentSnapshot = await getDocs(enrollmentsQuery);
-      
-      // Step 2: Har enrollment se courseId nikalo
-      const coursePromises = enrollmentSnapshot.docs.map(async (enrollDoc) => {
-        const courseId = enrollDoc.data().courseId;
-        
-        // Step 3: Course ki details fetch karo
-        const courseDoc = await getDoc(doc(db, 'courses', courseId));
-        
-        return {
-          id: courseDoc.id,
-          ...courseDoc.data()
-        };
-      });
+      setLoading(true);
 
-      // Step 4: Saare courses ka data wait karo
-      const coursesData = await Promise.all(coursePromises);
-      setMyCourses(coursesData);
-      
-    } catch (error) {
-      console.error('Error fetching courses:', error);
+      const q = query(
+        collection(db, "enrollments"),
+        where("studentId", "==", user.uid)  // ✅ Match Auth UID
+      );
+
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        setCourses([]);
+        return;
+      }
+
+      const list = [];
+      for (const d of snap.docs) {
+        const courseSnap = await getDoc(doc(db, "courses", d.data().courseId));
+        if (courseSnap.exists()) {
+          list.push({ id: courseSnap.id, ...courseSnap.data() });
+        }
+      }
+
+      setCourses(list);
+    } catch (err) {
+      console.error("Error fetching courses:", err);
+      setCourses([]);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <p className="text-center mt-10">Loading your courses...</p>;
 
   return (
-    <div>
-      <h2>My Courses</h2>
-      
-      {myCourses.length === 0 ? (
-        <p>No courses assigned yet.</p>
+    <div className="max-w-3xl mx-auto mt-10 p-6">
+      <h2 className="text-2xl font-bold text-center mb-6">My Courses</h2>
+
+      {courses.length === 0 ? (
+        <p className="text-center text-gray-500">No course assigned yet.</p>
       ) : (
-        <ul>
-          {myCourses.map(course => (
-            <li key={course.id}>
-              <h3>{course.name}</h3>
-              <p>{course.description}</p>
-              <p>Duration: {course.duration}</p>
-            </li>
-          ))}
-        </ul>
+        courses.map(c => (
+          <div key={c.id} className="border p-4 rounded mb-4 shadow hover:shadow-md">
+            <h3 className="font-semibold text-lg">{c.name}</h3>
+            {c.description && <p>{c.description}</p>}
+            {c.duration && <p className="text-gray-500">{c.duration}</p>}
+          </div>
+        ))
       )}
     </div>
   );
 }
-
-export default MyCourses;
-

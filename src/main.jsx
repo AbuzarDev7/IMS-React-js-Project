@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './config/redux/store/store'
-
+import './index.css'
 import Navbar from './components/Navbar'
 import ProtectedRoutes from './components/ProtectedRoutes'
 
@@ -38,7 +38,7 @@ createRoot(document.getElementById('root')).render(
 
         <Route path="/students" element={
           <ProtectedRoutes role={['Admin']}>
-            <Student />
+            <Student /> 
           </ProtectedRoutes>
         } />
 
