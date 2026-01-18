@@ -21,7 +21,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-screen w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between shadow-xl">
+    <div className=" h-screen w-64  bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between shadow-xl">
       {/* Logo */}
       <div className="text-center py-6 border-b border-gray-700">
         <h1 className="text-3xl font-extrabold tracking-wide text-indigo-400">IMS</h1>

@@ -1,4 +1,5 @@
-
+// src/pages/Admin/AddCourse.jsx
+// This page allows admin to create new courses
 
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
@@ -6,7 +7,7 @@ import { db } from "../../../config/firebase/firebase";
 import { useNavigate } from "react-router-dom";
 
 const AddCourse = () => {
-
+  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -16,6 +17,7 @@ const AddCourse = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Available course categories
   const courseCategories = [
     "Web Development",
     "App Development", 
@@ -27,7 +29,7 @@ const AddCourse = () => {
     "Other"
   ];
 
-
+  // Pre-made course templates
   const popularCourses = [
     {
       name: "Web Development Bootcamp",
@@ -61,7 +63,7 @@ const AddCourse = () => {
     }
   ];
 
-
+  // Handle input changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -69,6 +71,7 @@ const AddCourse = () => {
     });
   };
 
+  // Use a template to auto-fill form
   const useTemplate = (template) => {
     setFormData({
       name: template.name,
@@ -76,11 +79,13 @@ const AddCourse = () => {
       duration: template.duration,
       category: template.category
     });
-    // Scroll to form
+    // Scroll to top to see filled form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-
+  // ========================================
+  // IMPORTANT: Save course to Firestore
+  // ========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -88,9 +93,10 @@ const AddCourse = () => {
     try {
       console.log("🔄 Adding course...", formData);
 
-      // Save course to Firestore
+      // ✅ CRITICAL FIX: Save as "courseName" not "name"
+      // This must match what AssignCourse and MyCourses expect
       await addDoc(collection(db, "courses"), {
-        name: formData.name,
+        courseName: formData.name,  // ✅ Changed from "name" to "courseName"
         description: formData.description,
         duration: formData.duration,
         category: formData.category,
@@ -98,8 +104,8 @@ const AddCourse = () => {
         status: "active"
       });
 
-      console.log(" Course added successfully!");
-      alert(" Course successfully added!");
+      console.log("✅ Course added successfully!");
+      alert(`✅ Course "${formData.name}" successfully added!`);
 
       // Reset form
       setFormData({
@@ -109,15 +115,13 @@ const AddCourse = () => {
         category: ""
       });
 
-
     } catch (error) {
-      console.error(" Error adding course:", error);
-      alert(" Error: " + error.message);
+      console.error("❌ Error adding course:", error);
+      alert("❌ Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
@@ -253,7 +257,7 @@ const AddCourse = () => {
                 disabled={loading}
                 className="flex-1 bg-green-600 text-white py-4 px-6 rounded-xl hover:bg-green-700 disabled:bg-green-300 transition-colors font-bold text-lg shadow-lg"
               >
-                {loading ? "⏳ Adding Course..." : " Add Course"}
+                {loading ? "⏳ Adding Course..." : "✅ Add Course"}
               </button>
 
               <button
@@ -307,11 +311,17 @@ const AddCourse = () => {
             to help students understand what they'll learn. Include key topics and skills.
           </p>
         </div>
+
+        {/* IMPORTANT NOTE */}
+        <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-5">
+          <p className="text-sm text-yellow-800">
+            <strong>⚠️ Important:</strong> Courses are saved with field name "courseName" 
+            to match the enrollment system. This ensures proper course display for students.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default AddCourse;
-
-

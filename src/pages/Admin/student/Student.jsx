@@ -1,4 +1,4 @@
-// src/pages/Admin/student/Students.jsx
+
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import Sidebar from '../../../components/Navbar'
@@ -9,17 +9,17 @@ const Students = () => {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      // 1️⃣ Get all users
+      // 1 Get all users
       const usersSnap = await getDocs(collection(db, "users"));
       const studentsList = usersSnap.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
         .filter(user => user.role === "student");
 
-      // 2️⃣ Get enrollments
+      //  Get enrollments
       const enrollSnap = await getDocs(collection(db, "enrollments"));
       const enrollments = enrollSnap.docs.map(doc => doc.data());
 
-      // 3️⃣ Attach courses
+      //  Attach courses
       const finalStudents = studentsList.map(student => {
         const myCourses = enrollments
           .filter(e => e.studentId === student.id)

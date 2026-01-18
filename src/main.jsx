@@ -5,16 +5,9 @@ import { store } from './config/redux/store/store'
 import './index.css'
 
 import ProtectedRoutes from './components/ProtectedRoutes'
-
 import Login from './pages/Admin/Login'
-
-
 import StudentDashboard from './pages/Admin/student/StudentDashboard'
-
-
-
 import MyCourse from './pages/Student/MyCourse'
-
 import AddCourse from './pages/Admin/courses/AddCourse'
 import AddStudent from './pages/Admin/student/AddStudent'
 import Courses from './pages/Admin/courses/Courses'
@@ -26,60 +19,61 @@ import Dashboard from './pages/Admin/Dashboard'
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <BrowserRouter>
-  
       <Routes>
         <Route path="/login" element={<Login />} />
 
+        {/* Admin Routes */}
         <Route index element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <Dashboard/>
           </ProtectedRoutes>
         } />
 
         <Route path="/students" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <Student /> 
           </ProtectedRoutes>
         } />
 
         <Route path="/students/dashboard" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <StudentDashboard />
           </ProtectedRoutes>
         } />
 
         <Route path="/students/add" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <AddStudent />
           </ProtectedRoutes>
         } />
 
         <Route path="/courses" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <Courses />
           </ProtectedRoutes>
         } />
 
         <Route path="/courses/add" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <AddCourse />
           </ProtectedRoutes>
         } />
 
         <Route path="/assign-course" element={
-          <ProtectedRoutes role={['Admin']}>
+          <ProtectedRoutes role={['admin']}>
             <AssignCourse />
           </ProtectedRoutes>
         } />
 
+        {/* Student Routes */}
         <Route path="/my-courses" element={
-          <ProtectedRoutes role={['Student']}>
+          <ProtectedRoutes role={['student']}>
             <MyCourse />
           </ProtectedRoutes>
         } />
 
         <Route path="/profile" element={
-          <ProtectedRoutes role={['Student']}>
+          <ProtectedRoutes role={['student']}>
             <Profile />
           </ProtectedRoutes>
         } />
