@@ -44,20 +44,18 @@ const StudentProfile = () => {
 
   if (loading) {
     return (
-  <>
-     
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-4"></div>
           <p className="text-lg font-medium text-gray-700">Loading profile...</p>
         </div>
-      </div></>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-md mx-auto mt-16 p-6 bg-red-50 rounded-xl border border-red-300 shadow-md text-center">
+      <div className="max-w-md mx-auto mt-24 p-6 bg-red-50 rounded-xl border border-red-300 shadow-md text-center">
         <div className="text-5xl mb-3">❌</div>
         <p className="text-red-700 font-semibold text-lg">{error}</p>
       </div>
@@ -66,7 +64,7 @@ const StudentProfile = () => {
 
   if (!profile) {
     return (
-      <div className="max-w-md mx-auto mt-16 p-6 bg-yellow-50 rounded-xl border border-yellow-300 shadow-md text-center">
+      <div className="max-w-md mx-auto mt-24 p-6 bg-yellow-50 rounded-xl border border-yellow-300 shadow-md text-center">
         <div className="text-5xl mb-3">⚠️</div>
         <p className="text-yellow-700 font-semibold text-lg">Profile not found</p>
       </div>
@@ -74,27 +72,24 @@ const StudentProfile = () => {
   }
 
   return (
-    
- <>
+    <div className="min-h-screen bg-gray-50 pt-24 px-4 md:px-6">
+      <StudentNavbar />
 
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <br />
-      <StudentNavbar/>
-      <div className="max-w-xl mx-auto">
-
+      {/* Scrollable Container */}
+      <div className="max-w-xl mx-auto pb-20"> {/* pb-20 ensures last card fully visible */}
         {/* Header */}
-        <div className="flex flex-col items-center bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-10 shadow-xl">
+        <div className="flex flex-col items-center bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-10 shadow-2xl transform transition-transform duration-500 hover:scale-[1.01]">
           <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-5xl font-bold text-indigo-600 shadow-lg">
             {profile.name?.charAt(0).toUpperCase()}
           </div>
-          <h1 className="mt-4 text-3xl font-bold text-white">{profile.name}</h1>
+          <h1 className="mt-4 text-3xl font-extrabold text-white">{profile.name}</h1>
           <p className="mt-1 text-indigo-200 uppercase tracking-wide">{profile.role}</p>
         </div>
 
         {/* Profile Cards */}
         <div className="mt-8 space-y-5">
-
-          <div className="flex items-center p-5 bg-white rounded-xl shadow hover:shadow-lg transition-shadow border border-gray-200">
+          {/* Name */}
+          <div className="flex items-center p-5 bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-gray-200 transform hover:-translate-y-1 hover:scale-[1.01]">
             <FaUserGraduate className="text-indigo-500 text-3xl mr-4" />
             <div>
               <p className="text-gray-400 text-sm">Name</p>
@@ -102,7 +97,8 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          <div className="flex items-center p-5 bg-white rounded-xl shadow hover:shadow-lg transition-shadow border border-gray-200">
+          {/* Email */}
+          <div className="flex items-center p-5 bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-gray-200 transform hover:-translate-y-1 hover:scale-[1.01]">
             <FaEnvelope className="text-green-500 text-3xl mr-4" />
             <div>
               <p className="text-gray-400 text-sm">Email</p>
@@ -110,18 +106,17 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          <div className="flex items-center p-5 bg-white rounded-xl shadow hover:shadow-lg transition-shadow border border-gray-200">
+          {/* Role */}
+          <div className="flex items-center p-5 bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-gray-200 transform hover:-translate-y-1 hover:scale-[1.01]">
             <FaIdBadge className="text-purple-500 text-3xl mr-4" />
             <div>
               <p className="text-gray-400 text-sm">Role</p>
               <p className="text-gray-800 font-semibold text-lg capitalize">{profile.role}</p>
             </div>
           </div>
-
         </div>
-
       </div>
-    </div></>
+    </div>
   );
 };
 
