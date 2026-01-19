@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../../config/firebase/firebase";
+import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+
+
 
 const AddStudent = () => {
   const [name, setName] = useState("");
@@ -14,21 +19,26 @@ const AddStudent = () => {
     }
 
     setLoading(true);
+    
     try {
-      //  Add student in Firestore only
-      await addDoc(collection(db, "users"), {
-        uid: "student-" + Date.now(), // unique id
+
+      const studentData = {
         name,
         email,
-        password, // save password
         role: "student",
+        password, 
         createdAt: new Date(),
-      });
+        isActive: true,
+       
+      };
 
-      alert("Student added successfully!");
+      await addDoc(collection(db, "users"), studentData);
+
+      alert("Student added successfully! Student can now login with provided credentials.");
       setName("");
       setEmail("");
       setPassword("");
+
     } catch (error) {
       console.error(error);
       alert("Failed to add student: " + error.message);
@@ -42,7 +52,6 @@ const AddStudent = () => {
       <h2 className="text-2xl font-bold mb-6 text-center text-indigo-600">
         Add New Student
       </h2>
-
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-2">Student Name</label>
@@ -54,7 +63,6 @@ const AddStudent = () => {
             placeholder="Enter student name"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-2">Email</label>
           <input
@@ -65,7 +73,6 @@ const AddStudent = () => {
             placeholder="student@example.com"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-2">Password</label>
           <input
@@ -76,7 +83,6 @@ const AddStudent = () => {
             placeholder="Enter password"
           />
         </div>
-
         <button
           onClick={handleAddStudent}
           disabled={loading}

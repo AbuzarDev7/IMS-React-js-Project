@@ -1,5 +1,4 @@
-// src/pages/Admin/AddCourse.jsx
-// This page allows admin to create new courses
+
 
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
@@ -83,9 +82,6 @@ const AddCourse = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ========================================
-  // IMPORTANT: Save course to Firestore
-  // ========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -93,10 +89,9 @@ const AddCourse = () => {
     try {
       console.log("🔄 Adding course...", formData);
 
-      // ✅ CRITICAL FIX: Save as "courseName" not "name"
-      // This must match what AssignCourse and MyCourses expect
+    
       await addDoc(collection(db, "courses"), {
-        courseName: formData.name,  // ✅ Changed from "name" to "courseName"
+        courseName: formData.name,  
         description: formData.description,
         duration: formData.duration,
         category: formData.category,
@@ -104,8 +99,8 @@ const AddCourse = () => {
         status: "active"
       });
 
-      console.log("✅ Course added successfully!");
-      alert(`✅ Course "${formData.name}" successfully added!`);
+      // console.log("Course added successfully!");
+      alert(` Course "${formData.name}" successfully added!`);
 
       // Reset form
       setFormData({
@@ -116,8 +111,8 @@ const AddCourse = () => {
       });
 
     } catch (error) {
-      console.error("❌ Error adding course:", error);
-      alert("❌ Error: " + error.message);
+      // console.error(" Error adding course:", error);
+      alert(" Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -127,7 +122,7 @@ const AddCourse = () => {
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         
-        {/* ========== HEADER ========== */}
+        {/*  HEADER*/}
         <div className="bg-gradient-to-r from-green-600 to-green-800 text-white rounded-xl shadow-lg p-8 mb-8">
           <h1 className="text-4xl font-bold flex items-center gap-3">
             <span className="text-5xl">📚</span>
@@ -138,7 +133,7 @@ const AddCourse = () => {
           </p>
         </div>
 
-        {/* ========== MAIN FORM ========== */}
+        {/* ========== MAIN FORM */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             
