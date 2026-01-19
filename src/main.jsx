@@ -6,7 +6,7 @@ import './index.css'
 
 import ProtectedRoutes from './components/ProtectedRoutes'
 import Login from './pages/Admin/Login'
-import StudentDashboard from './pages/Admin/student/StudentDashboard'
+
 import MyCourse from './pages/Student/MyCourse'
 import AddCourse from './pages/Admin/courses/AddCourse'
 import AddStudent from './pages/Admin/student/AddStudent'
@@ -35,11 +35,7 @@ createRoot(document.getElementById('root')).render(
           </ProtectedRoutes>
         } />
 
-        <Route path="/students/dashboard" element={
-          <ProtectedRoutes role={['admin']}>
-            <StudentDashboard />
-          </ProtectedRoutes>
-        } />
+      
 
         <Route path="/students/add" element={
           <ProtectedRoutes role={['admin']}>
