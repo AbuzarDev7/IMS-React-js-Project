@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Navbar from "../../components/Navbar";
 import { auth, db } from "../../config/firebase/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const Dashboard = () => {
   const [adminName, setAdminName] = useState("");
@@ -12,76 +12,55 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  // ✅ Get logged-in admin email from Firebase Auth
+  // Get logged-in admin email
   useEffect(() => {
-    const fetchAdminEmail = async () => {
+    const fetchAdminEmail = () => {
       if (auth.currentUser) {
         const email = auth.currentUser.email;
         setAdminEmail(email);
         localStorage.setItem("adminEmail", email);
       } else {
-        // Agar login nahi hai to redirect to login
         navigate("/login");
       }
     };
-
     fetchAdminEmail();
   }, [navigate]);
 
-  // ✅ Fetch admin name from Firestore `users` collection
+  // Fetch admin name from Firestore
   useEffect(() => {
-    const fetchAdminName = async () => {
-      if (!adminEmail) return;
-
-      try {
-        const q = query(collection(db, "users"), where("email", "==", adminEmail));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          const adminData = snap.docs[0].data();
-          setAdminName(adminData.name || "");
-        } else {
-          setAdminName("Admin"); // Fallback
-        }
-      } catch (error) {
-        console.error("Error fetching admin name:", error);
+    if (!adminEmail) return;
+    const q = query(collection(db, "users"), where("email", "==", adminEmail));
+    const unsub = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        setAdminName(snapshot.docs[0].data().name || "Admin");
+      } else {
         setAdminName("Admin");
       }
-    };
-
-    fetchAdminName();
+    });
+    return () => unsub();
   }, [adminEmail]);
 
-  // ✅ Count students (replace with Firestore if needed)
+  //  Realtime students count
   useEffect(() => {
-    const fetchStudents = async () => {
-      // Replace this static data with Firestore fetch if required
-      const users = [
-        { role: "admin" },
-        { role: "student" },
-        { role: "student" },
-        { role: "student" },
-      ];
-      const students = users.filter((user) => user.role === "student");
-      setTotalStudents(students.length);
-    };
-
-    fetchStudents();
+    const q = query(collection(db, "users"), where("role", "==", "student"));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setTotalStudents(snapshot.size);
+    });
+    return () => unsub();
   }, []);
 
-  // ✅ Count courses (replace with Firestore if needed)
+  // Realtime courses count
   useEffect(() => {
-    const fetchCourses = async () => {
-      const courses = [1, 2, 3, 4, 5];
-      setTotalCourses(courses.length);
-    };
-
-    fetchCourses();
+    const q = query(collection(db, "courses"));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setTotalCourses(snapshot.size);
+    });
+    return () => unsub();
   }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Navbar />
-
       <main className="flex-1 md:ml-64 p-6 pt-24 md:pt-6 overflow-y-auto">
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

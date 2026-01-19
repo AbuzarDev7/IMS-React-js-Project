@@ -1,8 +1,6 @@
-
 import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../../config/firebase/firebase";
+import { db } from "../../../config/firebase/firebase";
 
 const AddStudent = () => {
   const [name, setName] = useState("");
@@ -11,24 +9,18 @@ const AddStudent = () => {
   const [loading, setLoading] = useState(false);
 
   const handleAddStudent = async () => {
-    if (!name) return alert("Please fill Name");
-    if (!email) return alert("Please fill Email");
-    if (!password) return alert("Please fill Password");
+    if (!name || !email || !password) {
+      return alert("Please fill all fields!");
+    }
 
     setLoading(true);
     try {
-      
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
+      //  Add student in Firestore only
       await addDoc(collection(db, "users"), {
-        uid: user.uid, // Firebase Auth UID save
+        uid: "student-" + Date.now(), // unique id
         name,
         email,
+        password, // save password
         role: "student",
         createdAt: new Date(),
       });
@@ -39,11 +31,7 @@ const AddStudent = () => {
       setPassword("");
     } catch (error) {
       console.error(error);
-      if (error.code === "auth/email-already-in-use") {
-        alert("This email is already registered!");
-      } else {
-        alert("Failed to add student: " + error.message);
-      }
+      alert("Failed to add student: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -85,7 +73,7 @@ const AddStudent = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400"
-            placeholder="Minimum 6 characters"
+            placeholder="Enter password"
           />
         </div>
 
